@@ -23,5 +23,5 @@ void UAuraAnimInstance::BlueprintUpdateProperties(float DeltaTime)
 	 Velocity = AuraCharacter->GetVelocity();
 	GroundSpeed = Velocity.Size();
 	
-	
+	GroundSpeed > 3.0f ? bShouldMove = true : bShouldMove = false;
 }

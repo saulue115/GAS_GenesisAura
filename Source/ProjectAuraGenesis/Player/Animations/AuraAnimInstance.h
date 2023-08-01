@@ -31,6 +31,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Animation)
 	FVector Velocity;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Animation)
+	uint8 bShouldMove : 1;
 	
 	
 	AAuraCharacter* AuraCharacter  = nullptr;
