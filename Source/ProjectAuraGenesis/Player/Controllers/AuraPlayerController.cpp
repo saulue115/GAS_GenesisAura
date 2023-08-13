@@ -3,10 +3,71 @@
 
 #include "AuraPlayerController.h"
 
+#include "ProjectAuraGenesis/Intercation/EnemyInterface.h"
+
 
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
+}
+
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
+}
+
+void AAuraPlayerController::CursorTrace()
+{
+	FHitResult Cursor;
+	GetHitResultUnderCursor(ECC_Visibility,false,Cursor);
+
+	if(!Cursor.bBlockingHit) return;
+
+	LastActor = ThisActor;
+	ThisActor = Cast<IEnemyInterface>(Cursor.GetActor());
+
+	//Line Trace from cursor.There are several scenarios
+	//if --> Last Actor is null && This actor is null -  do nothing
+	//if --> Last Actor is null && This actor is validate -  highlight this actor
+	//if --> Last Actor is valid && This actor is null -  unhighlight last actor
+	//if --> Both Actors are valid, but last actor != this actor - unhighlight last actor and highlight this actor
+	//if --> Both actor are valid, and are the same actors -  Do nothing
+
+	if(LastActor == nullptr)
+	{
+		if(ThisActor != nullptr)
+		{
+			//Case B
+			ThisActor->HighlightActor();
+		}else
+		{
+			//Case A - both are null,do nothing
+			
+		}
+	}else //last actor is valid
+	{
+		if(ThisActor == nullptr)
+		{
+			//Case C
+			LastActor->UnHighlightActor();
+		}
+		else
+		{
+			if(LastActor != ThisActor)
+			{
+				//Case D
+				LastActor->UnHighlightActor();
+				ThisActor->HighlightActor();
+			}else
+			{
+				//Case E -- do nothing
+				
+			}
+		}
+	}
+	
 }
 
 void AAuraPlayerController::BeginPlay()

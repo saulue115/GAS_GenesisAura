@@ -20,10 +20,18 @@ public:
 
 	AAuraCharacter();
 
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void OnRep_PlayerState() override;
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Components)
 	TObjectPtr<USpringArmComponent> BoomCamera = nullptr;
 
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Components)
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
+
+private:
+
+	void InitAbilityActorInfo();
 };

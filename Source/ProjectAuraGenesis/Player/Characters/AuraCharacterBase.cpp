@@ -20,7 +20,13 @@ AAuraCharacterBase::AAuraCharacterBase()
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	check(Weapon);
+}
+
+UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 
