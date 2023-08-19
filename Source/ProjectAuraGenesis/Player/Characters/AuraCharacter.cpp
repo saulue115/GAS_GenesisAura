@@ -3,7 +3,9 @@
 
 #include "AuraCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectAuraGenesis/Player/Controllers/AuraPlayerController.h"
 #include "ProjectAuraGenesis/Player/Controllers/AuraPlayerState.h"
+#include "ProjectAuraGenesis/UI/HUD/AuraHUD.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -47,6 +49,8 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	
@@ -58,4 +62,21 @@ void AAuraCharacter::InitAbilityActorInfo()
 
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+
+	auto AuraPlayerController =  Cast<AAuraPlayerController>(GetController());
+
+	if(AuraPlayerController)
+	{
+		auto AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD());
+
+		if(AuraHUD)
+		{
+			AuraHUD->InitOverlay(AuraPlayerController,AuraPlayerState,AbilitySystemComponent,AttributeSet);
+		}
+	}
+
+
+	
+	
 }

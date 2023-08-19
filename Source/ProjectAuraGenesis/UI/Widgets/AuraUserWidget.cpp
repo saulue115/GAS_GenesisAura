@@ -5,18 +5,25 @@
 #include "Slate/SObjectWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Slate/SlateBrushAsset.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 void UAuraUserWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	UpdateBoxSize2();
+	UpdateBoxSize();
 
-	UpdateBackgroundBrush2();
+	UpdateBackgroundBrush();
 
 
-	UpdateGlobeImage2();
+	UpdateGlobeImage();
+
+	UpdateGlobePadding();
+
+	UpdateGlassBrush();
+
+	UpdateGlassPadding();
 	
 }
 
@@ -28,7 +35,7 @@ void UAuraUserWidget::SetWidgetController(UObject* InWidgetController)
 
 
 
-void UAuraUserWidget::UpdateBoxSize2()
+void UAuraUserWidget::UpdateBoxSize()
 {
 	// USizeBox* SizeBoxRoot = NewObject<USizeBox>(this);
 
@@ -39,14 +46,11 @@ void UAuraUserWidget::UpdateBoxSize2()
 	SizeBoxRoot->SetWidthOverride(BoxWidth);
 
 	SizeBoxRoot->SetHeightOverride(BoxHeight);
-
 	
-
-
 	
 }
 
-void UAuraUserWidget::UpdateBackgroundBrush2()
+void UAuraUserWidget::UpdateBackgroundBrush()
 {
 	//UImage* ImageBackground2 = NewObject<UImage>(this);
 	// Obtener el valor de la variable de Blueprint "Image_Background"
@@ -57,13 +61,13 @@ void UAuraUserWidget::UpdateBackgroundBrush2()
 	ImageBackground2->SetBrush(BackgroundBrush2);
 }
 
-void UAuraUserWidget::UpdateGlobeImage2()
+void UAuraUserWidget::UpdateGlobeImage()
 {
 	// Crea el estilo para el ProgressBar y Slate bush
 	FProgressBarStyle ProgressBarStyle;
 	FSlateBrush SlateBrush;
 	
-	UProgressBar* ProgressBar = Cast<UProgressBar>(GetWidgetFromName("ProgressBar_Globe"));
+	ProgressBar = Cast<UProgressBar>(GetWidgetFromName("ProgressBar_Globe"));
 
 	if(!ProgressBar) return;
 
@@ -73,3 +77,125 @@ void UAuraUserWidget::UpdateGlobeImage2()
 
 	ProgressBar->SetWidgetStyle(ProgressBarStyle);
 }
+
+void UAuraUserWidget::UpdateGlobePadding()
+{
+	ProgressBar = Cast<UProgressBar>(GetWidgetFromName("ProgressBar_Globe"));
+
+	if(!ProgressBar) return;
+
+	OverlaySlot = Cast<UOverlaySlot>(ProgressBar->Slot);
+
+	if(!OverlaySlot) return;
+
+	OverlaySlot->SetPadding(FMargin(GlobePadding));
+}
+
+void UAuraUserWidget::UpdateGlassBrush()
+{
+	GlassImage = Cast<UImage>(GetWidgetFromName("Image_Glass"));
+
+	if(!GlassImage) return;
+
+	GlassImage->SetBrush(GlassBrush2);
+}
+
+void UAuraUserWidget::UpdateGlassPadding()
+{
+	GlassImage = Cast<UImage>(GetWidgetFromName("Image_Glass"));
+
+	if(!GlassImage) return;
+
+	OverlaySlot = Cast<UOverlaySlot>(GlassImage->Slot);
+
+	if(!OverlaySlot) return;
+
+	OverlaySlot->SetPadding(FMargin(GlobePadding));
+	
+}
+
+
+
+
+#pragma region Overlay Globe Controller Functions
+
+void UAuraUserWidget::CheckProgressBarPercent(const float& MinValue,const float& MaxValue)
+{
+	ProgressBar = Cast<UProgressBar>(GetWidgetFromName("ProgressBar_Globe"));
+
+	if(!ProgressBar) return;
+	
+	ProgressBar->SetPercent(UKismetMathLibrary::SafeDivide(MinValue,MaxValue));
+}
+
+
+void UAuraUserWidget::CastToBlueprint()
+{
+	OverlayWidgetControllerClass = Cast<UOverlayWidgetController>(WidgetController);
+
+	if(!OverlayWidgetControllerClass) return;
+	
+	OverlayWidgetControllerClass->OnManaChanged.AddDynamic(this,&UAuraUserWidget::GetSafeMana);
+	OverlayWidgetControllerClass->OnMaxManaChanged.AddDynamic(this,&UAuraUserWidget::GetSafeMaxMana);
+		
+	
+}
+
+
+
+void UAuraUserWidget::ListeningHealthAttributes()
+{
+
+	OverlayWidgetControllerClass = Cast<UOverlayWidgetController>(WidgetController);
+
+	if(!OverlayWidgetControllerClass) return;
+	
+	OverlayWidgetControllerClass->OnHealthChanged.AddDynamic(this,&UAuraUserWidget::GetSafeHealth);
+	OverlayWidgetControllerClass->OnMaxHealthChanged.AddDynamic(this,&UAuraUserWidget::GetSafeMaxHealth);
+
+}
+
+void UAuraUserWidget::ListeningManaAttributes()
+{
+	OverlayWidgetControllerClass = Cast<UOverlayWidgetController>(WidgetController);
+
+	if(!OverlayWidgetControllerClass) return;
+	
+	OverlayWidgetControllerClass->OnManaChanged.AddDynamic(this,&UAuraUserWidget::GetSafeMana);
+	OverlayWidgetControllerClass->OnMaxManaChanged.AddDynamic(this,&UAuraUserWidget::GetSafeMaxMana);
+}
+
+
+void UAuraUserWidget::GetSafeHealth(float NewHealth)
+{
+	Health = NewHealth;
+
+	CheckProgressBarPercent(Health,MaxHealth);
+}
+
+void UAuraUserWidget::GetSafeMaxHealth(float NewMaxHealth)
+{
+	MaxHealth = NewMaxHealth;
+
+
+	CheckProgressBarPercent(Health,MaxHealth);
+}
+
+void UAuraUserWidget::GetSafeMana(float NewMana)
+{
+	Mana = NewMana;
+	
+	CheckProgressBarPercent(Mana,MaxMana);
+}
+
+void UAuraUserWidget::GetSafeMaxMana(float NewMaxMana)
+{
+	MaxMana = NewMaxMana;
+
+	CheckProgressBarPercent(Mana,MaxMana);
+}
+
+
+#pragma endregion
+
+

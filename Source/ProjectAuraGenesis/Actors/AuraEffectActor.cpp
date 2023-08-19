@@ -27,6 +27,7 @@ void AAuraEffectActor::BeginPlay()
 
 	check(MeshComponent);
 
+	// SphereComponent->OnComponentBeginOverlap.AddDynamic(this,&AAuraEffectActor::OnOverlap);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this,&AAuraEffectActor::OnOverlap);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this,&AAuraEffectActor::EndOverlap);
 	
@@ -41,7 +42,7 @@ void AAuraEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 		UAuraAttributeSet* MutableAuraAttributeSet = const_cast<UAuraAttributeSet*>(AuraAttributeSet);
 		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
-		
+		MutableAuraAttributeSet->SetMana(AuraAttributeSet->GetMana() - 25.f);
 		
 		Destroy();
 	}

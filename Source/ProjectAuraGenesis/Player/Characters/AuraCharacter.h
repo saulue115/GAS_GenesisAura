@@ -8,9 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "AuraCharacter.generated.h"
 
-/**
- * 
- */
+class ATestActor;
+
 UCLASS()
 class PROJECTAURAGENESIS_API AAuraCharacter : public AAuraCharacterBase
 {
@@ -31,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Components)
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
 
+
+
+	
 private:
 
 	void InitAbilityActorInfo();
